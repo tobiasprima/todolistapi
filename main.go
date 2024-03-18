@@ -1,9 +1,14 @@
 package main
 
-import "log"
+import (
+	"fmt"
+	"log"
+)
 
 func main(){
 	log.Println("test")
 }
 
-//testci
+func sayHello(name string) string {
+	return fmt.Sprintf("Hello %s", name)
+}
