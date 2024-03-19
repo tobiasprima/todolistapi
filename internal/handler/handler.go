@@ -119,3 +119,21 @@ func UpdateTodoStatus(c *gin.Context){
 
 	c.JSON(http.StatusOK, gin.H{"success": "todos status updated"})
 }
+
+func DeleteTodo(c *gin.Context){
+	id := c.Param("id")
+	_id, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id provided"})
+		return
+	}
+
+	res, err := database.Todos.DeleteOne(c, bson.M{"_id": _id})
+	if res.DeletedCount == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "todos not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "todos deleted"})
+}
