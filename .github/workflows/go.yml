@@ -51,7 +51,7 @@ jobs:
       #     tags: ${{ secrets.DOCKER_USERNAME }}/go-contanerized:latest
 
       - name: Build
-        run: go build -o bin .
+        run: go build -o bin/cmd/... .
 
       - name: Test
         run: go test -v ./cmd/...
