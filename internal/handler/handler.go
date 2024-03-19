@@ -93,3 +93,29 @@ func UpdateTodoTitle(c *gin.Context){
 
 	c.JSON(http.StatusOK, gin.H{"success": "todos title updated"})
 }
+
+func UpdateTodoStatus(c *gin.Context){
+	id := c.Param("id")
+	_id, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id provided"})
+		return
+	}
+
+	var body struct {
+		Status	bool				`json:"status" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&body); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+
+	_, err = database.Todos.UpdateOne(c, bson.M{"_id": _id}, bson.M{"set": bson.M{"status": body.Status}})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to update todos status"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"success": "todos status updated"})
+}
