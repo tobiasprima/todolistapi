@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"todolist-api/internal/database"
+	"todolist-api/internal/handler"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
