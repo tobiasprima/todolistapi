@@ -5,6 +5,7 @@ import (
 	"os"
 	"todolist-api/internal/database"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -32,4 +33,15 @@ func main(){
 			fmt.Println(err)
 		}
 	}()
+
+	r := gin.Default()
+
+	r.POST("/todo", handler.CreateTodos)
+
+	r.GET("/todos", handler.GetTodos)
+	r.GET("/todo/:id", handler.GetTodo)
+
+	r.PATCH("/todo/:id", handler.UpdateTodo)
+	r.DELETE("/todo/:id", handler.DeleteTodo)
+
 }
