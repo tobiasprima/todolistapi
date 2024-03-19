@@ -11,31 +11,31 @@ import (
 )
 
 func CreateTodos(c *gin.Context) {
-	var body models.CreateTodosRequest
-	if err := c.ShouldBindJSON(&body); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
-		return
-	}
+    var body models.CreateTodosRequest
+    if err := c.ShouldBindJSON(&body); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+        return
+    }
 
-	// Check if the status is not provided, then default it to false
-	if body.Status == nil {
-		defaultStatus := false
-		body.Status = &defaultStatus
-	}
+    // Check if the status is not provided or is nil, then default it to false
+    if body.Status == nil {
+        defaultStatus := false
+        body.Status = &defaultStatus
+    }
 
-	res, err := database.Todos.InsertOne(c, body)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to add todo"})
-		return
-	}
+    res, err := database.Todos.InsertOne(c, body)
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to add todo"})
+        return
+    }
 
-	todos := models.Todos{
-		ID:     res.InsertedID.(primitive.ObjectID),
-		Title:  body.Title,
-		Status: *body.Status,
-	}
+    todos := models.Todos{
+        ID:     res.InsertedID.(primitive.ObjectID),
+        Title:  body.Title,
+        Status: *body.Status,
+    }
 
-	c.JSON(http.StatusCreated, todos)
+    c.JSON(http.StatusCreated, todos)
 }
 
 
