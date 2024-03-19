@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"os"
 	"todolist-api/internal/database"
+	"todolist-api/internal/handler"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -32,4 +34,17 @@ func main(){
 			fmt.Println(err)
 		}
 	}()
+
+	r := gin.Default()
+
+	r.POST("/todo", handler.CreateTodos)
+
+	r.GET("/todos", handler.GetTodos)
+	r.GET("/todo/:id", handler.GetTodo)
+
+	r.PATCH("/todo/:id/title", handler.UpdateTodoTitle)
+	r.PATCH("/todo/:id/status", handler.UpdateTodoStatus)
+	r.DELETE("/todo/:id", handler.DeleteTodo)
+
+	r.Run(":8080")
 }
