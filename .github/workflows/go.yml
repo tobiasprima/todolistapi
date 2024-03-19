@@ -43,15 +43,11 @@ jobs:
       - name: Install dependencies
         run: go get -v ./...
 
-      # - name: Build and Push
-      #   uses: docker/build-push-action@v4
-      #   with:
-      #     file: ./Dockerfile
-      #     push: true
-      #     tags: ${{ secrets.DOCKER_USERNAME }}/go-contanerized:latest
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/go-contanerized:latest .
 
-      - name: Build
-        run: go build -o bin/cmd/... .
+      - name: Push Docker image to registry
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/go-contanerized:latest
 
       - name: Test
         run: go test -v ./cmd/...
