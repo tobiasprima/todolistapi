@@ -42,7 +42,8 @@ func main(){
 	r.GET("/todos", handler.GetTodos)
 	r.GET("/todo/:id", handler.GetTodo)
 
-	r.PATCH("/todo/:id", handler.UpdateTodo)
+	r.PATCH("/todo/:id", handler.UpdateTodoTitle)
+	r.PATCH("/todo/:id", handler.UpdateTodoStatus)
 	r.DELETE("/todo/:id", handler.DeleteTodo)
 
 }
