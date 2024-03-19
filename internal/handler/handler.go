@@ -18,7 +18,7 @@ func CreateTodos(c *gin.Context) {
     }
 
     // Check if the status is not provided or is nil, then default it to false
-    if body.Status == nil {
+	if body.Status == nil {
         defaultStatus := false
         body.Status = &defaultStatus
     }
@@ -32,7 +32,7 @@ func CreateTodos(c *gin.Context) {
     todos := models.Todos{
         ID:     res.InsertedID.(primitive.ObjectID),
         Title:  body.Title,
-        Status: *body.Status,
+        Status: body.Status,
     }
 
     c.JSON(http.StatusCreated, todos)
@@ -51,6 +51,13 @@ func GetTodos(c *gin.Context){
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to fetch todos"})
 		return 
 	}
+
+	for i := range todos {
+        if todos[i].Status == nil {
+            defaultStatus := false
+            todos[i].Status = &defaultStatus
+        }
+    }
 
 	c.JSON(http.StatusOK, todos)
 }
@@ -72,6 +79,10 @@ func GetTodo(c *gin.Context){
 		return
 	}
 
+	if todos.Status == nil {
+        defaultStatus := false
+        todos.Status = &defaultStatus
+    }
 	c.JSON(http.StatusOK, todos)
 }
 
@@ -92,11 +103,11 @@ func UpdateTodoTitle(c *gin.Context){
 		return
 	}
 
-	_, err = database.Todos.UpdateOne(c, bson.M{"_id": _id}, bson.M{"set": bson.M{"title": body.Title}})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to update todos title"})
-		return
-	}
+	_, err = database.Todos.UpdateOne(c, bson.M{"_id": _id}, bson.M{"$set": bson.M{"title": body.Title}})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to update todos title"})
+        return
+    }
 
 	c.JSON(http.StatusOK, gin.H{"success": "todos title updated"})
 }
@@ -111,18 +122,18 @@ func UpdateTodoStatus(c *gin.Context){
 	}
 
 	var body struct {
-		Status	bool				`json:"status" binding:"required"`
+		Status *bool  `json:"status" binding:"required"`
 	}
 	if err := c.ShouldBindJSON(&body); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
 		return
 	}
 
-	_, err = database.Todos.UpdateOne(c, bson.M{"_id": _id}, bson.M{"set": bson.M{"status": body.Status}})
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to update todos status"})
-		return
-	}
+    _, err = database.Todos.UpdateOne(c, bson.M{"_id": _id}, bson.M{"$set": bson.M{"status": *body.Status}})
+    if err != nil {
+        c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to update todos status"})
+        return
+    }
 
 	c.JSON(http.StatusOK, gin.H{"success": "todos status updated"})
 }
