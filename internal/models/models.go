@@ -10,5 +10,5 @@ type Todos struct {
 
 type CreateTodosRequest struct{
 	Title	string				`json:"title,omitempty" bson:"title"`
-	Status	bool				`json:"status,omitempty" bson:"status"`
+	Status	*bool				`json:"status,omitempty" bson:"status"`
 }
