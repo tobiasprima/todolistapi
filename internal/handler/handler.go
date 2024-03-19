@@ -47,3 +47,23 @@ func GetTodos(c *gin.Context){
 
 	c.JSON(http.StatusOK, todos)
 }
+
+func GetTodo(c *gin.Context){
+	id := c.Param("id")
+	_id, err := primitive.ObjectIDFromHex(id)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid id provided"})
+		return
+	}
+
+	result := database.Todos.FindOne(c, primitive.M{"_id": _id})
+	todos := models.Todos{}
+	err = result.Decode(&todos)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to find todo"})
+		return
+	}
+
+	c.JSON(http.StatusOK, todos)
+}
