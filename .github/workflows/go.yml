@@ -39,16 +39,19 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-        
+
       - name: Install dependencies
         run: go get -v ./...
 
-      - name: Build and Push
-        uses: docker/build-push-action@v4
-        with:
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/go-contanerized:latest
+      # - name: Build and Push
+      #   uses: docker/build-push-action@v4
+      #   with:
+      #     file: ./Dockerfile
+      #     push: true
+      #     tags: ${{ secrets.DOCKER_USERNAME }}/go-contanerized:latest
+
+      - name: Build
+        run: go build -o bin .
 
       - name: Test
         run: go test -v ./cmd/...
