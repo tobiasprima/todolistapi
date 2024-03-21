@@ -216,3 +216,25 @@ func UpdateTodoOrder(c *gin.Context) {
 
     c.JSON(http.StatusOK, gin.H{"success": "todo order updated"})
 }
+
+func ResetTodoOrders(c *gin.Context) {
+    var todos []models.Todos
+    if err := c.ShouldBindJSON(&todos); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+        return
+    }
+
+    // Iterate over each todo and set its order to zero
+    for _, todo := range todos {
+        filter := bson.M{"_id": todo.ID}
+        update := bson.M{"$set": bson.M{"order": 0}}
+
+        _, err := database.Todos.UpdateOne(c, filter, update)
+        if err != nil {
+            c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to update todo order"})
+            return
+        }
+    }
+
+    c.JSON(http.StatusOK, gin.H{"success": "todo orders reset to zero"})
+}

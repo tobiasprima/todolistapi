@@ -56,6 +56,7 @@ func main(){
 	r.DELETE("/todo/:id", handler.DeleteTodo)
 
 	r.PATCH("/todos/reorder", handler.UpdateTodoOrder)
+	r.POST("/todos/reset", handler.ResetTodoOrders)
 
 	r.Run(":8080")
 }
