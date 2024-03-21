@@ -6,6 +6,7 @@ type Todos struct {
 	ID		primitive.ObjectID	`json:"_id,omitempty" bson:"_id,omitempty"`
 	Title	string				`json:"title,omitempty" bson:"title"`
 	Status	*bool				`json:"status" bson:"status"`
+	Order	int					`json:"order" bson:"order"`
 }
 
 type CreateTodosRequest struct {

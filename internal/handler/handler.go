@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"sort"
 	"todolist-api/internal/database"
 	"todolist-api/internal/models"
 
@@ -58,6 +59,11 @@ func GetTodos(c *gin.Context){
             todos[i].Status = &defaultStatus
         }
     }
+
+	sort.Slice(todos, func(i, j int) bool {
+        return todos[i].Order > todos[j].Order
+    })
+
 
 	c.JSON(http.StatusOK, todos)
 }
@@ -154,4 +160,59 @@ func DeleteTodo(c *gin.Context){
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": "todos deleted"})
+}
+
+func UpdateTodoOrder(c *gin.Context) {
+    var todos []models.Todos
+    if err := c.ShouldBindJSON(&todos); err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+        return
+    }
+
+	resetOrder := false
+	for _, todo := range todos {
+		if todo.Order != 0 {
+			resetOrder = true
+			break
+		}
+	}
+
+	if resetOrder{
+		for _, todo := range todos {
+            filter := bson.M{"_id": todo.ID, "order": bson.M{"$exists": true}}
+            update := bson.M{"$unset": bson.M{"order": ""}}
+            _, err := database.Todos.UpdateOne(c, filter, update)
+            if err != nil {
+                c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to update todo order"})
+                return
+            }
+		}
+	} else {
+		maxFalseOrder := 0
+        for _, todo := range todos {
+            if !*todo.Status && todo.Order > maxFalseOrder {
+                maxFalseOrder = todo.Order
+            }
+        }
+
+        order := maxFalseOrder + 1
+        for _, todo := range todos {
+            filter := bson.M{"_id": todo.ID}
+            var update bson.M
+            if *todo.Status {
+                update = bson.M{"$set": bson.M{"order": order}}
+                order++
+            } else {
+                update = bson.M{"$set": bson.M{"order": todo.Order}}
+            }
+            _, err := database.Todos.UpdateOne(c, filter, update)
+            if err != nil {
+                c.JSON(http.StatusInternalServerError, gin.H{"error": "unable to update todo order"})
+                return
+            }
+        }
+    }
+	
+
+    c.JSON(http.StatusOK, gin.H{"success": "todo order updated"})
 }

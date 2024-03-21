@@ -8,12 +8,20 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main(){
+
+	err := godotenv.Load()
+	if err != nil {
+		fmt.Println("Error loading .env file:", err)
+		return
+	}
+
 	databaseUri := os.Getenv("DATABASE_URI")
 
-	err := database.InitMongoDb((databaseUri), "todolist")
+	err = database.InitMongoDb((databaseUri), "todolist")
 
 	if err != nil {
 		fmt.Println(err)
@@ -46,6 +54,8 @@ func main(){
 	r.PATCH("/todo/:id/title", handler.UpdateTodoTitle)
 	r.PATCH("/todo/:id/status", handler.UpdateTodoStatus)
 	r.DELETE("/todo/:id", handler.DeleteTodo)
+
+	r.PATCH("/todos/reorder", handler.UpdateTodoOrder)
 
 	r.Run(":8080")
 }
