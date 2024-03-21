@@ -1,4 +1,4 @@
-# Golang Restful API with MongoDB Database
+# Golang ToDoList Restful API with MongoDB Database
 This project is hosted on https://todolistapi-kcjj.onrender.com
 
 This is a backend for TodoList Web Apps on
